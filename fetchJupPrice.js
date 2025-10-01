@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { loadGistFile, updateGistFiles } from "./gist.js";
+import { loadGistFile, updateGistFiles, updateHourlyGist } from "./gist.js";
 
 // Token mint -> CSV file mapping
 const TOKENS = {
@@ -25,6 +25,7 @@ export async function fetchAndSavePrices() {
   const iso = new Date().toISOString();
   const updates = {};
 
+  // --- 3-min Gist updates ---
   for (const [mint, filename] of Object.entries(TOKENS)) {
     const obj = data[mint];
     if (!obj || typeof obj.usdPrice !== "number") continue;
@@ -33,7 +34,7 @@ export async function fetchAndSavePrices() {
     let rows = await loadGistFile(filename);
     rows.push(`${iso},${price}`);
 
-    const cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000;
+    const cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000; // 3 days
     const header = rows[0];
     rows = [header].concat(
       rows.slice(1).filter(r => {
@@ -49,20 +50,39 @@ export async function fetchAndSavePrices() {
   if (Object.keys(updates).length > 0) {
     await updateGistFiles(updates);
   }
-}
 
-const now = new Date();
-if (now.getMinutes() === 0) {
-  const hourlyUpdates = {};
-  for (const [mint, filename] of Object.entries(TOKENS)) {
-    const obj = data[mint];
-    if (!obj || typeof obj.usdPrice !== "number") continue;
-    const price = obj.usdPrice;
-    const hourlyFilename = filename.replace(".csv", "_hourly.csv");
-    hourlyUpdates[hourlyFilename] = { content: `timestamp,price\n${iso},${price}\n` };
-    console.log(`Hourly snapshot: ${hourlyFilename} = ${price} at ${iso}`);
-  }
-  if (Object.keys(hourlyUpdates).length > 0) {
-    await updateHourlyGist(hourlyUpdates);
+  // --- Hourly snapshot with history (append rows, keep 15 days) ---
+  const now = new Date();
+  if (now.getMinutes() === 0) {
+    const hourlyUpdates = {};
+    const cutoffHourly = Date.now() - 15 * 24 * 60 * 60 * 1000; // 15 days
+
+    for (const [mint, filename] of Object.entries(TOKENS)) {
+      const obj = data[mint];
+      if (!obj || typeof obj.usdPrice !== "number") continue;
+
+      const price = obj.usdPrice;
+      const hourlyFilename = filename.replace(".csv", "_hourly.csv");
+
+      // Load existing hourly rows
+      let rows = await loadGistFile(hourlyFilename);
+      rows.push(`${iso},${price}`);
+
+      // Keep only last 15 days
+      const header = rows[0];
+      rows = [header].concat(
+        rows.slice(1).filter(r => {
+          const t = new Date(r.split(",")[0]).getTime();
+          return !isNaN(t) && t >= cutoffHourly;
+        })
+      );
+
+      hourlyUpdates[hourlyFilename] = { content: rows.join("\n") + "\n" };
+      console.log(`Hourly snapshot updated: ${hourlyFilename} = ${price} at ${iso}`);
+    }
+
+    if (Object.keys(hourlyUpdates).length > 0) {
+      await updateHourlyGist(hourlyUpdates);
+    }
   }
 }
