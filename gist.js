@@ -25,3 +25,19 @@ export async function updateGistFiles(updates) {
   });
   if (!res.ok) throw new Error(`Failed to update gist: ${res.status}`);
 }
+
+export async function updateHourlyGist(updates) {
+  const HOURLY_GIST_ID = process.env.HOURLY_GIST_ID;
+  const GH_TOKEN = process.env.GH_TOKEN;
+
+  const res = await fetch(`https://api.github.com/gists/${HOURLY_GIST_ID}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `token ${GH_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ files: updates })
+  });
+
+  if (!res.ok) throw new Error(`Failed to update hourly gist: ${res.status}`);
+}
