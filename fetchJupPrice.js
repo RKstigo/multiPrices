@@ -50,3 +50,19 @@ export async function fetchAndSavePrices() {
     await updateGistFiles(updates);
   }
 }
+
+const now = new Date();
+if (now.getMinutes() === 0) {
+  const hourlyUpdates = {};
+  for (const [mint, filename] of Object.entries(TOKENS)) {
+    const obj = data[mint];
+    if (!obj || typeof obj.usdPrice !== "number") continue;
+    const price = obj.usdPrice;
+    const hourlyFilename = filename.replace(".csv", "_hourly.csv");
+    hourlyUpdates[hourlyFilename] = { content: `timestamp,price\n${iso},${price}\n` };
+    console.log(`Hourly snapshot: ${hourlyFilename} = ${price} at ${iso}`);
+  }
+  if (Object.keys(hourlyUpdates).length > 0) {
+    await updateHourlyGist(hourlyUpdates);
+  }
+}
