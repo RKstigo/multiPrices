@@ -65,7 +65,7 @@ export async function fetchAndSavePrices() {
       const hourlyFilename = filename.replace(".csv", "_hourly.csv");
 
       // Load existing hourly rows
-      let rows = await loadGistFile(hourlyFilename);
+      let rows = await loadGistFile(hourlyFilename, process.env.HOURLY_GIST_ID);
       rows.push(`${iso},${price}`);
 
       // Keep only last 15 days
