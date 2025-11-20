@@ -8,10 +8,10 @@ const TOKENS = {
   "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": "bonkPrices.csv",
   "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv": "penguPrices.csv",
   "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R": "rayPrices.csv",
-  "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm": "wifPrices.csv",
-  "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr": "popcatPrices.csv",
+  "So11111111111111111111111111111111111111112": "solPrices.csv",
+  "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs": "wethPrices.csv",
   "J3NKxxXZcnNiMjKw9hYb2K4LUxgwB6t1FtPtQVsv3KFr": "spxPrices.csv",
-  "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump": "fartPrices.csv",
+  "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh": "wbtcPrices.csv",
   "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4": "jlpPrices.csv"
 };
 
